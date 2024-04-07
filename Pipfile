@@ -8,6 +8,7 @@ peewee = "*"
 psycopg = "*"
 psycopg2-binary = "*"
 flask = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
