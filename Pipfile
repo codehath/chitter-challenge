@@ -9,6 +9,7 @@ psycopg = "*"
 psycopg2-binary = "*"
 flask = "*"
 python-dotenv = "*"
+bcrypt = "*"
 
 [dev-packages]
 

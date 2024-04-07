@@ -3,6 +3,7 @@ from peewee import *
 from flask import Flask, request, render_template, redirect
 from lib.person import *
 from lib.peep import *
+import bcrypt
 
 from datetime import datetime
 
@@ -60,29 +61,43 @@ def get_register():
 def login():
     global logged_in_user
     username = request.form["username"]
-    password = request.form["password"]
+    password = request.form["password"].encode(
+        "utf-8"
+    )  # The password from the login form needs to be encoded
 
-    if Person.select().where(Person.username == username).count() != 0:
+    # Fetch the user from the database
+    try:
         person = Person.select().where(Person.username == username).get()
-        if person.password == password:
-            person.logged_in = True
-            person.save()
-            logged_in_user = person
-            return redirect("/home")
-        else:
-            message = "Invalid password"
-    else:
+    except Person.DoesNotExist:
+        # Handle user not found scenario
         message = "Invalid username"
-    return render_template("/login.html", message=message)
+        return render_template("/login.html", message=message)
+
+    # Check if the hashed password matches
+    if bcrypt.checkpw(password, person.password.encode("utf-8")):
+        # Password matches, proceed with login
+        person.logged_in = True
+        person.save()
+        logged_in_user = person
+        return redirect("/home")
+    else:
+        # Password does not match
+        message = "Invalid password"
+        return render_template("/login.html", message=message)
 
 
 @app.route("/register", methods=["POST"])
 def create_user():
+    password = request.form["password"].encode("utf-8")  # Encode the password
+    hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())  # Hash the password
+
     new_user = Person.create(
         name=request.form["name"],
         username=request.form["username"],
         email=request.form["email"],
-        password=request.form["password"],
+        password=hashed_password.decode(
+            "utf-8"
+        ),  # Store the hashed password as a string
     )
     return redirect("/home")
 
