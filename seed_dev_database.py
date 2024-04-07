@@ -74,7 +74,6 @@ for person in persons:
         username=person["username"],
         email=person["email"],
         password=hash_password(person["password"]),  # Hash password before storing
-        logged_in=False,
     )
 
 # Insert Peep data

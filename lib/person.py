@@ -11,7 +11,6 @@ class Person(Model):
     username = CharField()
     email = CharField()
     password = CharField()
-    logged_in = BooleanField(default=False)
 
     class Meta:
         database = db  # This model uses the "people.db" database.

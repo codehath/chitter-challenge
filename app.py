@@ -12,6 +12,8 @@ from datetime import datetime
 # Create a new Flask app
 app = Flask(__name__)
 
+# Set a secret key for session encryption
+app.secret_key = os.environ.get("SECRET_KEY", "your_secret_key_here")
 
 db = PostgresqlDatabase(db_name, user=db_user, password=db_password, host=db_host)
 
@@ -19,9 +21,6 @@ db = PostgresqlDatabase(db_name, user=db_user, password=db_password, host=db_hos
 db.connect()
 db.create_tables([Person, Peep], safe=True)
 
-
-# Set a secret key for session encryption
-app.secret_key = os.environ.get("SECRET_KEY", "your_secret_key_here")
 
 # == Your Routes Here ==
 # Pages
@@ -40,16 +39,37 @@ def get_index():
 
 @app.route("/home", methods=["GET"])
 def get_home():
-    global logged_in_user
-    if logged_in_user == None:
+    if "user_id" not in session:  # Redirect to login if user is not authenticated
         return redirect("/login")
+
+    user_id = session["user_id"]
+    logged_in_user = Person.get_by_id(user_id)
     peeps = Peep.select()
     return render_template("home.html", peeps=peeps, user=logged_in_user)
 
 
-@app.route("/login", methods=["GET"])
-def get_login():
-    return render_template("/login.html")
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "GET":
+        return render_template("login.html")
+    else:
+        username = request.form["username"]
+        password = request.form["password"].encode("utf-8")
+
+        try:
+            person = Person.select().where(Person.username == username).get()
+        except Person.DoesNotExist:
+            message = "Invalid username"
+            return render_template("login.html", message=message)
+
+        if bcrypt.checkpw(password, person.password.encode("utf-8")):
+            session["user_id"] = (
+                person.id
+            )  # Set user_id in session upon successful login
+            return redirect("/home")
+        else:
+            message = "Invalid password"
+            return render_template("login.html", message=message)
 
 
 @app.route("/register", methods=["GET"])
@@ -57,69 +77,41 @@ def get_register():
     return render_template("/register.html")
 
 
-### POST REQUESTS
-@app.route("/login", methods=["POST"])
-def login():
-    global logged_in_user
-    username = request.form["username"]
-    password = request.form["password"].encode(
-        "utf-8"
-    )  # The password from the login form needs to be encoded
-
-    # Fetch the user from the database
-    try:
-        person = Person.select().where(Person.username == username).get()
-    except Person.DoesNotExist:
-        # Handle user not found scenario
-        message = "Invalid username"
-        return render_template("/login.html", message=message)
-
-    # Check if the hashed password matches
-    if bcrypt.checkpw(password, person.password.encode("utf-8")):
-        # Password matches, proceed with login
-        person.logged_in = True
-        person.save()
-        logged_in_user = person
-        return redirect("/home")
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "GET":
+        return render_template("register.html")
     else:
-        # Password does not match
-        message = "Invalid password"
-        return render_template("/login.html", message=message)
+        password = request.form["password"].encode("utf-8")
+        hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
+
+        person = Person.create(
+            name=request.form["name"],
+            username=request.form["username"],
+            email=request.form["email"],
+            password=hashed_password.decode("utf-8"),
+        )
+        session["user_id"] = (
+            person.id
+        )  # Set user_id in session upon successful registration
+        return redirect("/home")
 
 
-@app.route("/register", methods=["POST"])
-def create_user():
-    password = request.form["password"].encode("utf-8")  # Encode the password
-    hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())  # Hash the password
-
-    Person.create(
-        name=request.form["name"],
-        username=request.form["username"],
-        email=request.form["email"],
-        password=hashed_password.decode(
-            "utf-8"
-        ),  # Store the hashed password as a string
-    )
-    return redirect("/home")
+@app.route("/logout", methods=["GET"])
+def logout():
+    session.pop("user_id", None)  # Remove user_id from session upon logout
+    return redirect("/")
 
 
 @app.route("/home", methods=["POST"])
 def create_peep():
-    global logged_in_user
-    Peep.create(content=request.form["content"], user_id=logged_in_user.id)
+    if "user_id" not in session:  # Redirect to login if user is not authenticated
+        return redirect("/login")
+
+    user_id = session["user_id"]
+    Peep.create(content=request.form["content"], user_id=user_id)
     peeps = Peep.select()
-    return render_template("home.html", peeps=peeps, user=logged_in_user)
-
-
-### LOG OUT
-@app.route("/home", methods=["DELETE"])
-def log_out():
-    global logged_in_user
-    # return logged_in_user.username
-    logged_in_user.logged_in = False
-    logged_in_user.save()
-    logged_in_user = None
-    return redirect("/home")
+    return render_template("home.html", peeps=peeps, user=Person.get_by_id(user_id))
 
 
 # These lines start the server if you run this file directly
