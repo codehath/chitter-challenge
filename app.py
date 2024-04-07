@@ -91,7 +91,7 @@ def create_user():
     password = request.form["password"].encode("utf-8")  # Encode the password
     hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())  # Hash the password
 
-    new_user = Person.create(
+    Person.create(
         name=request.form["name"],
         username=request.form["username"],
         email=request.form["email"],
