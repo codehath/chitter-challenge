@@ -1,26 +1,27 @@
-import os
 from peewee import *
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session
+from lib.env_variables import *
 from lib.person import *
 from lib.peep import *
+import os
 import bcrypt
+
 
 from datetime import datetime
 
 # Create a new Flask app
 app = Flask(__name__)
 
-# Define your Peewee database instance
-db = PostgresqlDatabase(
-    "chitter-challenge",  # Your database name
-    user="farhath",  # Your PostgreSQL username
-    password="",  # Your PostgreSQL password
-    host="localhost",  # Your PostgreSQL host
-)
+
+db = PostgresqlDatabase(db_name, user=db_user, password=db_password, host=db_host)
 
 # Connect to the database
 db.connect()
 db.create_tables([Person, Peep], safe=True)
+
+
+# Set a secret key for session encryption
+app.secret_key = os.environ.get("SECRET_KEY", "your_secret_key_here")
 
 # == Your Routes Here ==
 # Pages
