@@ -4,15 +4,13 @@ Chitter is a portfolio project developed in Week 4 of the Makers Academy softwar
 
 ## Features
 
--   **User Registration**: Users can create an account by providing their name, username, email, and password.
--   **User Login:** Registered users can log in using their username and password.
--   **Authentication:** Passwords are securely hashed using bcrypt before storing them in the database.
--   **Security:** User sessions are managed using Flask's session functionality.
--   **Peep Creation**: Only authenticated users can access the home page to post peeps.
--   **Peep Viewing**: All peeps are displayed in reverse chronological order on the home page and the user's home page.
--   **User Logout**: Logged-in users can log out of the application.
--   **Responsiveness:** The application is built with a responsive layout that adapts to different screen sizes.
--   **Redirect**: Unauthenticated users are redirected to the login page.
+-   User Registration and Authentication
+-   Secure Password Hashing with Bcrypt
+-   User Session Management
+-   Peep Creation and Viewing
+-   User Authorization and Redirection
+-   Responsive Web Design
+-   User Logout
 
 ## Tech Stack
 
@@ -25,17 +23,13 @@ Chitter is a portfolio project developed in Week 4 of the Makers Academy softwar
 
 ## Technical Approach and Skills Demonstrated
 
-The Chitter Challenge project was developed using a full-stack approach, utilizing Python and the Flask framework for the backend and HTML, CSS, and JavaScript for the frontend. The project showcases the following technical skills and development processes:
-
--   **User Authentication and Authorization:** Implemented user registration, authentication, and authorization mechanisms to ensure secure access to the application. Passwords are securely hashed using bcrypt for added security.
--   **Schema Design:** Designed and structured a relational database schema using PostgreSQL, ensuring efficient data storage and retrieval.
--   **Database Management:** Utilized the Peewee ORM for database management and querying, effectively interacting with the PostgreSQL database to store and retrieve user data and peeps.
--   **Responsive Web Design:** Designed and developed responsive web pages using HTML Jinja templates, Bootstrap and CSS ensuring a seamless user experience across different devices and screen sizes.
--   **Testing and Quality Assurance:** Implemented unit tests using the Pytest testing framework and Playwright to ensure the correctness and functionality of the application's codebase.
--   **Dependency Management:** Managed project dependencies effectively using Pipenv, ensuring a consistent and isolated development environment.
--   **Version Control and Collaboration:** Utilized Git for version control and hosted the codebase on GitHub, enabling collaborative development and version tracking.
-
-Through the development of this project, I have demonstrated proficiency in these technical skills and a systematic approach to software development, including design, implementation, testing, and deployment.
+-   Full-stack development with Python, Flask, and HTML/CSS/JavaScript
+-   User authentication, authorization, and secure password hashing
+-   PostgreSQL database schema design and management with Peewee ORM
+-   Responsive web design using HTML Jinja templates, Bootstrap, and CSS
+-   Unit testing with Pytest and end-to-end testing with Playwright
+-   Dependency management with Pipenv
+-   Version control and collaboration using Git and GitHub
 
 ## Prerequisites
 
@@ -62,19 +56,15 @@ Through the development of this project, I have demonstrated proficiency in thes
     pipenv install
     ```
 
-4. Set up the environment variables:
+4. Set up the environment variables in a `.env` file:
 
-    - Rename the `sample.env` file to `.env`
-
-        ```
-        DB_NAME=your_database_name
-        DB_USER=your_database_username
-        DB_PASSWORD=your_database_password
-        DB_HOST=your_database_host
-        SECRET_KEY=your_secret_key
-        ```
-
-        Replace `your_database_name`, `your_database_username`, `your_database_password`, `your_database_host`, and `your_secret_key` with your actual database and secret key values.
+    ```
+    DB_NAME=your_database_name
+    DB_USER=your_database_username
+    DB_PASSWORD=your_database_password
+    DB_HOST=your_database_host
+    SECRET_KEY=your_secret_key
+    ```
 
 5. Activate the virtual environment:
 
@@ -94,22 +84,16 @@ Through the development of this project, I have demonstrated proficiency in thes
     python app.py
     ```
 
-8. Access the application in your web browser at `http://localhost:5001`.
+8. Access the application at `http://localhost:5001`.
 
 ## Testing
 
-To run the unit tests for the Chitter Challenge application, use the following command:
+Run unit tests:
 
 ```
 pytest
 ```
 
-## Future Developement
+## Future Development
 
-Some additional features I may implement for Chitter:
-
--   Implementing user profiles with profile pictures and bio information.
--   Adding the ability to follow other users and view their peeps.
--   Introducing features like liking and commenting on peeps.
--   Implementing real-time updates using WebSocket technology.
--   Enhancing the user interface with more advanced styling and animations.
+-   User
